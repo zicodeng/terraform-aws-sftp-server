@@ -2,3 +2,4 @@
 creds.tfvars
 ssh-keys
 *.backup
+*.zip

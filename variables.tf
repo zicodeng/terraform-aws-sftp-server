@@ -7,5 +7,7 @@ variable "aws_secret_key" {
 }
 
 locals {
+  region         = "us-west-2"
+  account_id = "515107297873"
   s3_bucket_name = "zicodeng-terraform-aws-sftp-server"
 }

@@ -63,15 +63,13 @@ resource "aws_iam_role" "transfer_family_invocation_role" {
 
 data "aws_iam_policy_document" "transfer_family_invocation_policy_document" {
   statement {
-    actions = ["execute-api:Invoke"]
-
+    actions   = ["execute-api:Invoke"]
     resources = ["arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.transfer_family_api_gateway_rest_api.id}/*/GET/*"]
     effect    = "Allow"
   }
 
   statement {
-    actions = ["apigateway:GET"]
-
+    actions   = ["apigateway:GET"]
     resources = ["*"]
     effect    = "Allow"
   }
@@ -89,8 +87,7 @@ resource "aws_iam_role_policy_attachment" "transfer_family_invocation_policy_att
 
 # Lambda => Secrets Manager
 resource "aws_iam_role" "transfer_family_lambda_role" {
-  name = "transfer-family-lambda-role"
-
+  name               = "transfer-family-lambda-role"
   assume_role_policy = <<-EOF
     {
       "Version": "2012-10-17",
@@ -124,7 +121,7 @@ resource "aws_iam_policy" "transfer_family_lambda_secrets_manager_policy" {
             {
                 "Effect": "Allow",
                 "Action": "secretsmanager:GetSecretValue",
-                "Resource": "arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:SFTP/*"
+                "Resource": "arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:${local.secret_id_prefix}/*"
             }
         ]
     }

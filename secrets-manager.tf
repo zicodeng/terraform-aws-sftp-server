@@ -1,15 +1,18 @@
 # Secret for API_GATEWAY transfer server
-resource "aws_secretsmanager_secret" "zicodeng_secret" {
-  name = "SFTP/zicodeng"
+resource "aws_secretsmanager_secret" "secret_username" {
+  name = "${local.secret_id_prefix}/username"
 }
 
-resource "aws_secretsmanager_secret_version" "zicodeng_secret_version" {
-  secret_id     = aws_secretsmanager_secret.zicodeng_secret.id
-  secret_string = <<-EOF
-    {
-      "HomeDirectory": "/${local.s3_bucket_name}",
-      "Password": "foobar",
-      "Role": "${aws_iam_role.transfer_family_s3_role.arn}"
-    }
-  EOF
+resource "aws_secretsmanager_secret_version" "secret_username_version" {
+  secret_id     = aws_secretsmanager_secret.secret_username.id
+  secret_string = "zicodeng"
+}
+
+resource "aws_secretsmanager_secret" "secret_password" {
+  name = "${local.secret_id_prefix}/password"
+}
+
+resource "aws_secretsmanager_secret_version" "secret_password_version" {
+  secret_id     = aws_secretsmanager_secret.secret_password.id
+  secret_string = "123qwe"
 }

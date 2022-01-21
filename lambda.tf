@@ -15,6 +15,9 @@ resource "aws_lambda_function" "transfer_family_lambda" {
   environment {
     variables = {
       "SecretsManagerRegion" = local.region
+      "SecretIdPrefix"       = local.secret_id_prefix
+      "Role"                 = aws_iam_role.transfer_family_s3_role.arn
+      "HomeDirectory"        = "/${local.s3_bucket_name}"
     }
   }
 }

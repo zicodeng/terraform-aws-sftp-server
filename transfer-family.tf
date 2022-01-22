@@ -1,9 +1,18 @@
 resource "aws_transfer_server" "sftp_server" {
   identity_provider_type = "API_GATEWAY"
-  endpoint_type          = "PUBLIC"
-  protocols              = ["SFTP"]
-  invocation_role        = aws_iam_role.transfer_family_invocation_role.arn
-  url                    = aws_api_gateway_stage.transfer_family_api_gateway_stage.invoke_url
+  # If "PUBLIC", no need to use endpoint_details block
+  # endpoint_type          = "PUBLIC"
+  endpoint_type   = "VPC"
+  protocols       = ["SFTP"]
+  invocation_role = aws_iam_role.transfer_family_invocation_role.arn
+  logging_role    = aws_iam_role.transfer_family_cloudwatch_role.arn
+  url             = aws_api_gateway_stage.transfer_family_api_gateway_stage.invoke_url
+
+  endpoint_details {
+    address_allocation_ids = [aws_eip.transfer_family_eip_1.id, aws_eip.transfer_family_eip_2.id]
+    subnet_ids             = [aws_subnet.transfer_family_subnet_1.id, aws_subnet.transfer_family_subnet_2.id]
+    vpc_id                 = aws_vpc.transfer_family_vpc.id
+  }
 }
 
 # User for SERVICE_MANAGED transfer server

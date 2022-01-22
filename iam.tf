@@ -14,6 +14,38 @@ data "aws_iam_policy_document" "transfer_family_assume_role_policy_document" {
   }
 }
 
+# Transfer Family => CloudWatch
+resource "aws_iam_role" "transfer_family_cloudwatch_role" {
+  name               = "transfer-family-cloudwatch-role"
+  path               = "/"
+  description        = "Allow AWS Transfer to push logs to cloudwatch"
+  assume_role_policy = data.aws_iam_policy_document.transfer_family_assume_role_policy_document.json
+}
+
+data "aws_iam_policy_document" "transfer_family_cloudwatch_policy_document" {
+  statement {
+    actions = [
+      "logs:CreateLogStream",
+      "logs:DescribeLogStreams",
+      "logs:CreateLogGroup",
+      "logs:PutLogEvents"
+    ]
+    resources = ["arn:aws:logs:*:*:log-group:/aws/transfer/*"]
+    effect    = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "transfer_family_cloudwatch_policy" {
+  name        = "transfer-family-cloudwatch-policy"
+  description = "Allow AWS Transfer Family to push logs to CloudWatch"
+  policy      = data.aws_iam_policy_document.transfer_family_cloudwatch_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "transfer_family_cloudwatch_policy_attachment" {
+  role       = aws_iam_role.transfer_family_cloudwatch_role.name
+  policy_arn = aws_iam_policy.transfer_family_cloudwatch_policy.arn
+}
+
 # Transfer Family => S3
 resource "aws_iam_role" "transfer_family_s3_role" {
   name               = "transfer-family-s3-role"
@@ -25,7 +57,7 @@ data "aws_iam_policy_document" "transfer_family_s3_policy_document" {
   statement {
     actions   = ["s3:ListBucket", "s3:GetBucketLocation"]
     sid       = "AllowListingOfUserFolder"
-    resources = ["arn:aws:s3:::${aws_s3_bucket.sftp_bucket.bucket}"]
+    resources = ["arn:aws:s3:::${aws_s3_bucket.transfer_family_sftp_bucket.bucket}"]
     effect    = "Allow"
   }
 
@@ -37,7 +69,7 @@ data "aws_iam_policy_document" "transfer_family_s3_policy_document" {
       "s3:GetObjectVersion"
     ]
     sid       = "HomeDirObjectAccess"
-    resources = ["arn:aws:s3:::${aws_s3_bucket.sftp_bucket.bucket}/*"]
+    resources = ["arn:aws:s3:::${aws_s3_bucket.transfer_family_sftp_bucket.bucket}/*"]
     effect    = "Allow"
   }
 
@@ -86,23 +118,22 @@ resource "aws_iam_role_policy_attachment" "transfer_family_invocation_policy_att
 }
 
 # Lambda => Secrets Manager
+data "aws_iam_policy_document" "lambda_assume_role_policy_document" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+    effect = "Allow"
+  }
+}
+
 resource "aws_iam_role" "transfer_family_lambda_role" {
   name               = "transfer-family-lambda-role"
-  assume_role_policy = <<-EOF
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Action": "sts:AssumeRole",
-          "Principal": {
-            "Service": "lambda.amazonaws.com"
-          },
-          "Effect": "Allow",
-          "Sid": ""
-        }
-      ]
-    }
-  EOF
+  description        = "Allow AWS Lambda to access CloudWatch and Secrets Manager"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy_document.json
 }
 
 # Allow Lambda to upload logs to CloudWatch

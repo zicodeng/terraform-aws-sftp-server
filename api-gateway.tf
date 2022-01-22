@@ -1,4 +1,4 @@
-data "template_file" "api_definition" {
+data "template_file" "transfer_family_idp_api" {
   template = file("./api.yaml")
 
   vars = {
@@ -8,8 +8,8 @@ data "template_file" "api_definition" {
 
 resource "aws_api_gateway_rest_api" "transfer_family_api_gateway_rest_api" {
   name        = "transfer-family-api-gateway-rest-api"
-  description = "This API provides an IDP for AWS Transfer Family"
-  body        = data.template_file.api_definition.rendered
+  description = "This API provides an IDP (Identity Provider) for AWS Transfer Family"
+  body        = data.template_file.transfer_family_idp_api.rendered
 
   endpoint_configuration {
     types = [

@@ -1,4 +1,4 @@
-data "archive_file" "sftp_auth" {
+data "archive_file" "transfer_family_sftp_auth_archive_file" {
   type        = "zip"
   source_dir  = "./lambda/source/"
   output_path = "./sftp-auth.zip"
@@ -9,7 +9,7 @@ resource "aws_lambda_function" "transfer_family_lambda" {
   function_name    = "transfer-family-lambda"
   handler          = "index.lambda_handler"
   role             = aws_iam_role.transfer_family_lambda_role.arn
-  source_code_hash = data.archive_file.sftp_auth.output_base64sha256
+  source_code_hash = data.archive_file.transfer_family_sftp_auth_archive_file.output_base64sha256
   runtime          = "python3.7"
 
   environment {

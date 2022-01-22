@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "transfer_family_assume_role_policy_document" {
 resource "aws_iam_role" "transfer_family_cloudwatch_role" {
   name               = "transfer-family-cloudwatch-role"
   path               = "/"
-  description        = "Allow AWS Transfer to push logs to cloudwatch"
+  description        = "Allow AWS Transfer to push logs to CloudWatch"
   assume_role_policy = data.aws_iam_policy_document.transfer_family_assume_role_policy_document.json
 }
 

@@ -9,8 +9,8 @@ resource "aws_transfer_server" "sftp_server" {
   url             = aws_api_gateway_stage.transfer_family_api_gateway_stage.invoke_url
 
   endpoint_details {
-    address_allocation_ids = [aws_eip.transfer_family_eip_1.id, aws_eip.transfer_family_eip_2.id]
-    subnet_ids             = [aws_subnet.transfer_family_subnet_1.id, aws_subnet.transfer_family_subnet_2.id]
+    address_allocation_ids = [aws_eip.transfer_family_eip.id]
+    subnet_ids             = [aws_subnet.transfer_family_subnet.id]
     vpc_id                 = aws_vpc.transfer_family_vpc.id
   }
 }

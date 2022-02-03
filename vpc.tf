@@ -9,7 +9,7 @@ resource "aws_default_security_group" "transfer_family_sg" {
   vpc_id = aws_vpc.transfer_family_vpc.id
 
   ingress {
-    cidr_blocks = local.cidr_blocks
+    cidr_blocks = ["0.0.0.0/0"]
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -29,30 +29,16 @@ resource "aws_route" "transfer_family_route" {
   gateway_id             = aws_internet_gateway.transfer_family_internet_gateway.id
 }
 
-resource "aws_subnet" "transfer_family_subnet_1" {
+resource "aws_subnet" "transfer_family_subnet" {
   vpc_id            = aws_vpc.transfer_family_vpc.id
   cidr_block        = "10.0.0.0/25"
-  availability_zone = local.az_1
+  availability_zone = local.az
   tags = {
-    Name = "transfer-family-subnet-1"
+    Name = "transfer-family-subnet"
   }
 }
 
-resource "aws_subnet" "transfer_family_subnet_2" {
-  vpc_id            = aws_vpc.transfer_family_vpc.id
-  cidr_block        = "10.0.0.128/25"
-  availability_zone = local.az_2
-  tags = {
-    Name = "transfer-family-subnet-2"
-  }
-}
-
-resource "aws_eip" "transfer_family_eip_1" {
-  vpc                  = true
-  network_border_group = local.region
-}
-
-resource "aws_eip" "transfer_family_eip_2" {
+resource "aws_eip" "transfer_family_eip" {
   vpc                  = true
   network_border_group = local.region
 }
